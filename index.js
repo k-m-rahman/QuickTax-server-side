@@ -33,6 +33,11 @@ async function run() {
 
     app.get("/services", async (req, res) => {
       let query = {};
+
+      // getting the search text
+      if (req.query.searchQuery) {
+        query = { $text: { $search: `${req.query.searchQuery}` } };
+      }
       const cursor = serviceCollection.find(query);
       const services = await cursor.toArray();
       res.send(services);
