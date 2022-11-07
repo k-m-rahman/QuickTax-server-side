@@ -10,6 +10,7 @@ const port = process.env.PORT || 5000;
 
 // middleware
 app.use(cors());
+app.use(express.json());
 
 //database integration
 
@@ -20,8 +21,22 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+const serviceCollection = client.db("quickTax").collection("services");
+
+// for implementing search query
+
+serviceCollection.createIndex({ title: "text" });
+
 async function run() {
   try {
+    // services api
+
+    app.get("/services", async (req, res) => {
+      let query = {};
+      const cursor = serviceCollection.find(query);
+      const services = await cursor.toArray();
+      res.send(services);
+    });
   } finally {
   }
 }
