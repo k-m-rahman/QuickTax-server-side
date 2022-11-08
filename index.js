@@ -37,7 +37,16 @@ async function run() {
       // getting the search text
       if (req.query.searchQuery) {
         query = { $text: { $search: `${req.query.searchQuery}` } };
+      } else if (req.query.limit) {
+        query = {};
+        const services = await serviceCollection
+          .find(query)
+          .limit(parseInt(req.query.limit))
+          .toArray();
+
+        return res.send(services);
       }
+
       const cursor = serviceCollection.find(query);
       const services = await cursor.toArray();
       res.send(services);
