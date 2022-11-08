@@ -22,15 +22,14 @@ const client = new MongoClient(uri, {
 });
 
 const serviceCollection = client.db("quickTax").collection("services");
+const reviewsCollection = client.db("quickTax").collection("reviews");
 
-// for implementing search query
-
+// for implementing search query on services
 serviceCollection.createIndex({ title: "text" });
 
 async function run() {
   try {
     // all services api
-
     app.get("/services", async (req, res) => {
       let query = {};
 
@@ -58,6 +57,18 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const service = await serviceCollection.findOne(query);
       res.send(service);
+    });
+
+    // reviews api
+    app.get("/reviews", async (req, res) => {
+      let query = {};
+
+      if (req.query.serviceId) {
+        query = { serviceId: req.query.serviceId };
+        console.log(req.query.serviceId.bgRed);
+      }
+      const reviews = await reviewsCollection.find(query).toArray();
+      res.send(reviews);
     });
   } finally {
   }
