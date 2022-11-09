@@ -11,8 +11,6 @@
 
 ## **API**
 
-## **API**
-
 Server -> https://quick-tax-server-side.vercel.app/
 
 All Services -> https://quick-tax-server-side.vercel.app/services
