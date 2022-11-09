@@ -30,6 +30,8 @@ serviceCollection.createIndex({ title: "text" });
 async function run() {
   try {
     // all services api
+
+    //getting all the services
     app.get("/services", async (req, res) => {
       let query = {};
 
@@ -52,6 +54,8 @@ async function run() {
     });
 
     // single service api
+
+    //getting single service
     app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -67,7 +71,9 @@ async function run() {
 
       if (req.query.serviceId) {
         query = { serviceId: req.query.serviceId };
-        console.log(req.query.serviceId.bgRed);
+      } else if (req.query.email) {
+        query = { email: req.query.email };
+        console.log(req.query.email.bgRed);
       }
       const options = {
         sort: { date: -1 },
@@ -80,6 +86,14 @@ async function run() {
     app.post("/reviews", async (req, res) => {
       const review = req.body;
       const result = await reviewsCollection.insertOne(review);
+      res.send(result);
+    });
+
+    // api for deleting a single review
+    app.delete("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewsCollection.deleteOne(query);
       res.send(result);
     });
   } finally {
