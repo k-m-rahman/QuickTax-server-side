@@ -35,22 +35,34 @@ async function run() {
     app.get("/services", async (req, res) => {
       let query = {};
 
+      // sorting on the base of creation of the service
+      const options = {
+        sort: { date: -1 },
+      };
+
       // getting the search text
       if (req.query.searchQuery) {
         query = { $text: { $search: `${req.query.searchQuery}` } };
       } else if (req.query.limit) {
         query = {};
         const services = await serviceCollection
-          .find(query)
+          .find(query, options)
           .limit(parseInt(req.query.limit))
           .toArray();
 
         return res.send(services);
       }
 
-      const cursor = serviceCollection.find(query);
+      const cursor = serviceCollection.find(query, options);
       const services = await cursor.toArray();
       res.send(services);
+    });
+
+    // creating a new service
+    app.post("/services", async (req, res) => {
+      const service = req.body;
+      const result = await serviceCollection.insertOne(service);
+      res.send(result);
     });
 
     // single service api
