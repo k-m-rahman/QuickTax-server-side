@@ -69,7 +69,10 @@ async function run() {
         query = { serviceId: req.query.serviceId };
         console.log(req.query.serviceId.bgRed);
       }
-      const reviews = await reviewsCollection.find(query).toArray();
+      const options = {
+        sort: { date: -1 },
+      };
+      const reviews = await reviewsCollection.find(query, options).toArray();
       res.send(reviews);
     });
 
