@@ -60,6 +60,8 @@ async function run() {
     });
 
     // reviews api
+
+    // api for reading the reviews
     app.get("/reviews", async (req, res) => {
       let query = {};
 
@@ -69,6 +71,13 @@ async function run() {
       }
       const reviews = await reviewsCollection.find(query).toArray();
       res.send(reviews);
+    });
+
+    // api for inserting a review
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
+      res.send(result);
     });
   } finally {
   }
