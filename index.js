@@ -101,6 +101,22 @@ async function run() {
       res.send(result);
     });
 
+    // api for updating a review
+    app.patch("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const rating = req.body?.rating;
+      const review = req.body?.review;
+      const query = { _id: ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          rating: rating,
+          review: review,
+        },
+      };
+      const result = await reviewsCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
     // api for deleting a single review
     app.delete("/reviews/:id", async (req, res) => {
       const id = req.params.id;
