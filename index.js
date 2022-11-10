@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("colors");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 //
@@ -75,7 +76,9 @@ async function run() {
       res.send(service);
     });
 
+    //---------------
     // reviews api
+    //---------------
 
     // api for reading the reviews
     app.get("/reviews", async (req, res) => {
@@ -83,14 +86,23 @@ async function run() {
 
       if (req.query.serviceId) {
         query = { serviceId: req.query.serviceId };
-      } else if (req.query.email) {
-        query = { email: req.query.email };
-        console.log(req.query.email.bgRed);
       }
       const options = {
         sort: { date: -1 },
       };
       const reviews = await reviewsCollection.find(query, options).toArray();
+      res.send(reviews);
+    });
+
+    //-------------------------------
+    // jwt will be used from here now
+    //-------------------------------
+
+    // api for getting individual person's reviews
+    app.get("/myReviews/:email", async (req, res) => {
+      const email = req.params.email;
+      let query = { email: email };
+      const reviews = await reviewsCollection.find(query).toArray();
       res.send(reviews);
     });
 
@@ -124,6 +136,15 @@ async function run() {
       const result = await reviewsCollection.deleteOne(query);
       res.send(result);
     });
+
+    // jwt api
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      res.send(token);
+    });
   } finally {
   }
 }
@@ -131,7 +152,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Quick Tax server is running");
+  res.send("QuickTax server is running");
 });
 
 app.listen(port, () => {
