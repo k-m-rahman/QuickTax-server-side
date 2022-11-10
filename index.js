@@ -84,7 +84,6 @@ async function run() {
       // implemented pagination
       const currentPage = parseInt(req.query.currentPage);
       const cardsPerPage = parseInt(req.query.cardsPerPage);
-
       const cursor = serviceCollection.find(query);
       const services = await cursor
         .skip(currentPage * cardsPerPage)
