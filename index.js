@@ -66,6 +66,9 @@ async function run() {
       // getting the search text
       if (req.query.searchQuery) {
         query = { $text: { $search: `${req.query.searchQuery}` } };
+        const cursor = serviceCollection.find(query, options);
+        const services = await cursor.toArray();
+        return res.send(services);
       }
       // implementing limit for the client side home route
       else if (req.query.limit) {
@@ -77,9 +80,18 @@ async function run() {
         return res.send(services);
       }
 
-      const cursor = serviceCollection.find(query, options);
-      const services = await cursor.toArray();
-      res.send(services);
+      // sending all the services with count
+      // implemented pagination
+      const currentPage = parseInt(req.query.currentPage);
+      const cardsPerPage = parseInt(req.query.cardsPerPage);
+
+      const cursor = serviceCollection.find(query);
+      const services = await cursor
+        .skip(currentPage * cardsPerPage)
+        .limit(cardsPerPage)
+        .toArray();
+      const count = await serviceCollection.estimatedDocumentCount();
+      res.send({ count, services });
     });
 
     // creating a new service
